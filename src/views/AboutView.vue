@@ -2,37 +2,59 @@
   <div class="common-layout">
     <el-container>
       <el-header><!-- 抽奖用户 列表 -->
-        <el-text class="mx-1" type="success" size="large">随机抽取幸运观众,汗流浃背了吧。</el-text>
+        <el-text class="mx-1" type="success" size="large">随机抽取幸运观众。</el-text>
 
       </el-header>
       <el-main>
         <div class="demo">
           <!-- 中奖结束弹框 -->
-          <el-card style="max-width: 1200px">
-            <div class='addname'> <el-input v-model="addname" placeholder="请添加抽奖人员姓名"></el-input>
+          <el-card style="min-width: 1300px">
+            <div class='addname'>
+              <el-input v-model="addname" style="width: 1500px" :rows="2" type="textarea"
+                placeholder="添加人员名字格式类型。例如：胡晓东、陈小、尘嚣、胡晓丽" />
               <el-button plain type="primary" @click="mockUserData">添加</el-button>
             </div>
-
-            <div v-for="item in state.list" :key="item.id" style="display: inline-block;padding:20px">
-              <div style="display: inline-block;text-align: center;">
-                <div>
-                  {{ item.name }}
+            <div class="list">
+              <div ref="moudole" v-for="item in state.list" :key="item.id" style="display: inline-block;padding:20px;">
+                <div style="display: inline-block;text-align: center;">
+                  <div>
+                    {{ item.name }}
+                  </div>
                 </div>
-
               </div>
             </div>
+
             <div>
-              <p>中奖用户名称：{{ state.currentPerson?.name }}</p>
+              <p style=" font-weight: 1000;
+  color: brown;">中奖用户名称：{{ state.currentPerson?.name }}</p>
               <!-- 开始游戏按钮 -->
               <el-button plain type="primary" @click="startGameBtn" v-if="state.gameStatus === 'init'">开始抽奖</el-button>
               <el-button plain type="primary" disabled v-if="state.gameStatus === 'run'">进行中</el-button>
               <el-button plain type="primary" @click="restartGameBtn" v-if="state.gameStatus === 'end'">重新开始</el-button>
+              <el-button plain type="primary" @click="selectBtn">选择人数</el-button>
               <el-button plain type="info" @click="clearUserData">重置</el-button>
-
             </div>
           </el-card>
         </div>
+        <!-- 选择窗口 -->
+        <el-dialog v-model="dialogVisible" title="请选择随机人数" width="500">
+          <el-table @select-all="selectall" @select="selectEvent" :data="tableData" style="width: 100%">
+            <el-table-column type="selection" width="55" />
+            <el-table-column label="人员姓名" width="400">
+              <template #default="scope">{{ scope.row.name }}</template>
+            </el-table-column>
 
+
+          </el-table>
+          <template #footer>
+            <div class="dialog-footer">
+              <el-button @click="dialogVisible = false">取消</el-button>
+              <el-button type="primary" @click="userFixData">
+                确认
+              </el-button>
+            </div>
+          </template>
+        </el-dialog>
 
 
 
@@ -41,13 +63,13 @@
   </div>
 </template>
 
-<script setup>
-import { reactive, onMounted, ref } from 'vue'
+<script lang="ts" setup>
+import { reactive, onMounted, ref, computed } from 'vue'
 import { ElNotification } from 'element-plus'
+import { setCookie, getCookie, delCookie } from '../../unite/cookie'
 
 
-
-
+const moudole = ref()
 const state = reactive({
   list: [],
   currentPerson: {
@@ -64,12 +86,20 @@ let addname = ref('')
 const mockUserData = () => {
   if (addname.value !== '') {
     let data = []
-    data.push({
-      name: addname.value
+
+    // data.push({
+    //   name: ''
+    // })
+    data = addnameArr.value.map((x) => {
+      return { name: x }
     })
 
+
     state.list = [...data, ...state.list]
-    console.log(state.list)
+    // console.log([...data, ...state.list], 'asdj')
+    setCookie('perple', JSON.stringify(state.list), 24)
+    // localStorage.setItem('perple', state.list)
+
     ElNotification.success({
       message: '',
       title: '添加成功',
@@ -88,10 +118,14 @@ const mockUserData = () => {
 // 延时 delay
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 //重置人员名字
+const addnameArr = computed(() => {
+  return addname.value.split("、")
+
+})
 const clearUserData = () => {
   state.list = []
   addname.value = ''
-
+  delCookie('perple')
 
 }
 
@@ -114,16 +148,67 @@ const startGameBtn = async () => {
   state.openModal = true
 }
 
-const afterCloseModal = () => {
-  state.openModal = false
-}
 
+//选择人数queding抽奖
+const userFixData = () => {
+  state.list = selectState.value
+  dialogVisible.value = false;
+
+}
+import { ElTable } from 'element-plus'
+
+interface User {
+  date: string
+  name: string
+  address: string
+}
+let tableData: User[] = [
+
+]
+//选择人数的按钮
+let dialogVisible = ref(false)
+const selectBtn = () => {
+  let selectNumber = JSON.parse(getCookie('perple'))
+  if (selectNumber != []) {
+    dialogVisible.value = true;
+    tableData = selectNumber
+
+    // namestatus.value = getCookie('perple')
+    console.log(selectNumber, 'selectNumber');
+
+
+  }
+}
+//选择事件
+let selectState = ref([])
+const selectEvent = (value) => {
+  if (value != []) {
+    selectState.value = value
+  }
+
+  // console.log(state.list, 'hou');
+  // console.log(getCookie('perple'), 'getS');
+}
+//选择所有事件
+const selectall = (value) => {
+  if (value != []) {
+    selectState.value = value
+    console.log(value, 'all');
+
+  }
+}
 // 重新开始抽奖
 const restartGameBtn = () => {
   startGameBtn()
 }
 onMounted(() => {
+  // console.log(addnameArr.value.length, 'sdj');
   // mockUserData()
+  state.list = JSON.parse(getCookie('perple'))
+  // const value = getCookie('perple')
+  // console.log(moudole, 'moudole')
+
+
 })
 </script>
 <style>
@@ -148,5 +233,15 @@ onMounted(() => {
 .addname {
   display: flex;
   flex-wrap: nowrap;
+  margin-bottom: 5px;
+}
+
+.el-textarea__inner {
+  height: 17px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
 }
 </style>
