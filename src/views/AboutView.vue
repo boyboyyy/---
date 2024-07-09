@@ -204,7 +204,10 @@ const restartGameBtn = () => {
 onMounted(() => {
   // console.log(addnameArr.value.length, 'sdj');
   // mockUserData()
-  state.list = JSON.parse(getCookie('perple'))
+  if (JSON.parse(getCookie('perple'))) {
+    state.list = JSON.parse(getCookie('perple'))
+
+  }
   // const value = getCookie('perple')
   // console.log(moudole, 'moudole')
 
