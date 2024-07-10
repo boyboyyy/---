@@ -14,14 +14,18 @@
                 placeholder="添加人员名字格式类型。例如：胡晓东、陈小、尘嚣、胡晓丽" />
               <el-button plain type="primary" @click="mockUserData">添加</el-button>
             </div>
-            <div class="list">
-              <div ref="moudole" v-for="item in state.list" :key="item.id" style="display: inline-block;padding:20px;">
-                <div style="display: inline-block;text-align: center;">
-                  <div>
+            <div style="display:inline-block" lass="list">
+              <p style="width:50px;display: inline-block;" v-for="item in state.list" :key="item.id">
+                {{ item.name }} 
+              </p>
+              <!-- <span ref="moudole" v-for="item in state.list" :key="item.id"
+                style="; display: inline-block;padding:20px;">
+                <span style=" width: 50px;   box-sizing: border-box; display: inline-block;text-align: center;">
+                  <span style="width: 50px;   box-sizing: border-box; display: inline-block;">
                     {{ item.name }}
-                  </div>
-                </div>
-              </div>
+                  </span>
+                </span>
+              </span> -->
             </div>
 
             <div>
@@ -53,7 +57,7 @@
           <br>
           <!-- 确定人数 -->
           <el-form-item label="确定选出的人数" :label-width="formLabelWidth">
-            <el-input v-model="state.nums" placeholder="PS：选出的人数要小于等于总人数 " autocomplete="off" />
+            <el-input v-model="state.nums" placeholder="PS：选出的人数要小于总人数 " autocomplete="off" />
           </el-form-item>
 
           <template #footer>
