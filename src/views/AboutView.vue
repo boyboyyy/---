@@ -111,7 +111,8 @@ const mockUserData = () => {
 
     state.list = [...data, ...state.list]
     // console.log([...data, ...state.list], 'asdj')
-    setCookie('perple', JSON.stringify(state.list), 24)
+    window.localStorage.setItem('perple', JSON.stringify(state.list))
+    // setCookie('perple', JSON.stringify(state.list), 24)
     // localStorage.setItem('perple', state.list)
     addname.value = ''
     ElNotification.success({
@@ -141,7 +142,12 @@ const clearUserData = () => {
   state.flist = []
 
   addname.value = ''
-  delCookie('perple')
+  // delCookie('perple')
+  window.localStorage.removeItem('perple')
+  ElNotification.success({
+    title: '重置成功',
+    message: '人员名字已重置',
+  })
 
 }
 
@@ -241,6 +247,8 @@ const startGameBtn = async () => {
   // 
 }
 
+
+
 //选择人数queding抽奖
 const userFixData = () => {
   state.list = selectState.value
@@ -259,16 +267,19 @@ let tableData: User[] = [
 ]
 //选择人数的按钮
 let dialogVisible = ref(false)
+
 const selectBtn = () => {
-  let selectNumber = JSON.parse(getCookie('perple'))
-  if (selectNumber != []) {
-    dialogVisible.value = true;
+  dialogVisible.value = true;
+
+  // let selectNumber = JSON.parse(getCookie('perple'))
+  let selectNumber = JSON.parse(localStorage.getItem('perple'))
+  console.log(6666666666666); 
+  console.log(selectNumber, 'selectNumber');
+ 
+  if (selectNumber != []) { 
     tableData = selectNumber
-
-    // namestatus.value = getCookie('perple')
-    console.log(selectNumber, 'selectNumber');
-
-
+ 
+  
   }
 }
 //选择事件
@@ -277,9 +288,7 @@ const selectEvent = (value) => {
   if (value != []) {
     selectState.value = value
   }
-
-  // console.log(state.list, 'hou');
-  // console.log(getCookie('perple'), 'getS');
+ 
 }
 //选择所有事件
 const selectall = (value) => {
@@ -297,8 +306,8 @@ const restartGameBtn = () => {
 onMounted(() => {
   // console.log(addnameArr.value.length, 'sdj');
   // mockUserData()
-  if (JSON.parse(getCookie('perple'))) {
-    state.list = JSON.parse(getCookie('perple'))
+  if (JSON.parse(localStorage.getItem('perple'))) {
+    state.list = JSON.parse(localStorage.getItem('perple'))
 
   }
   // const value = getCookie('perple')
