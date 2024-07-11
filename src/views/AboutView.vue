@@ -3,7 +3,6 @@
     <el-container>
       <el-header><!-- 抽奖用户 列表 -->
         <el-text class="mx-1" type="success" size="large">随机抽取</el-text>
-
       </el-header>
       <el-main>
         <div class="demo">
